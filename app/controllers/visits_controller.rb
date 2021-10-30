@@ -7,7 +7,7 @@ class VisitsController < ApplicationController
   end
 
   def admin_index
-    @all_visits = Visit.all
+    @all_visits = ActiveRecord::Base.connection.execute("select * from Visits")
   end
 
   def change_status
@@ -23,8 +23,8 @@ class VisitsController < ApplicationController
 
   def new
     @client = current_user
-    @masters = Master.all
-    @services = Service.all
+    @masters = ActiveRecord::Base.connection.execute("select * from Users where type = 'Master'")
+    @services = ActiveRecord::Base.connection.execute("select * from Services")
   end
 
   def create

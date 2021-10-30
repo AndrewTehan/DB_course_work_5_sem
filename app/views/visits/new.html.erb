@@ -21,8 +21,8 @@
             <div class="col-md-3 form-group">
               <select class="form-select" aria-label="Default select example" name="visit[master_id]" id="masters" required="true">
                 <% @masters.each do |m| %>
-                  <option value=<%= m.id %>>
-                    <%= m.full_name %>
+                  <option value=<%= m["id"] %>>
+                    <%= m["first_name"] %> <%= m["last_name"] %>
                   </option>
                 <% end %>
               </select>
