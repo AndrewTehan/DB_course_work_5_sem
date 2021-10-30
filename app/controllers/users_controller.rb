@@ -3,7 +3,7 @@
 class UsersController < ApplicationController
   def index
     @user = current_user
-    @users = User.all
+    @users = ActiveRecord::Base.connection.execute("select * from Users")
   end
 
   def destroy
@@ -32,15 +32,15 @@ class UsersController < ApplicationController
   end
 
   def team
-    @masters = Master.all
+    @masters = ActiveRecord::Base.connection.execute("select * from Users where type = 'Master'")
   end
 
   def services
-    @services = Service.all
+    @services = ActiveRecord::Base.connection.execute("select * from Services")
   end
 
   def clients
-    @clients = User.all
+    @clients = ActiveRecord::Base.connection.execute("select * from Users")
   end
 
   private
