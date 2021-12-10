@@ -9,6 +9,9 @@ class ApplicationController < ActionController::Base
   rescue_from ActiveRecord::RecordNotFound, with: -> { render_404 } unless Rails.application.config.consider_all_requests_local
 
   protected
+  def connection_execute sql_query
+    ActiveRecord::Base.connection.execute("#{sql_query}")
+  end
 
   def default_url_options
     { locale: I18n.locale }

@@ -4,21 +4,22 @@
       <% if @all_visits.any?%>
         <div class="row">
         <%@all_visits.each do |visit|%>
-          <% visit_email = User.find_by(id: visit.client_id).email %>
-          <% master = Master.find_by(id: visit.master_id)%>
+          <% visit_email = connection_execute("select email from Users where id=#{visit["visit_client_id"]}") %>
           <div class="col-lg-4">
             <div class="box" style="text-align: center">
-              <span><%=visit_email%></span>
-              <p>Date: <%=visit.date.strftime("%H:%m %d/%m/%Y")%> <%= visit.master.full_name%> </p>
+              <span><%=visit_email[0]["email"]%></span> 
+              <%visit_master_full_name = connection_execute("select * from VisitMasterFullName(#{visit["visit_master_id"]})")%>
+              <p>Date: <%=visit["visit_date"].strftime("%H:%m %d/%m/%Y")%></p>
+              <p>Master: <%= visit_master_full_name[0]["master_first_name"]%> <%= visit_master_full_name[0]["master_last_name"]%></p>
               <div class="row">
                 <div class="col-md-7">
-                  <span>Status:<%=visit.state%></span>
+                  <span>Status:<%=visit["visit_state"]%></span>
                 </div>
                 <div class="col-md-5">
-                  <%if visit.state != 'done'%>
+                  <%if visit["visit_state"] != 'done'%>
                     <span>
                       <%= link_to "confirm",
-                      change_status_path(visit_id: visit.id),
+                      change_status_path(visit_id: visit["visit_id"]),
                       method: :put,
                       class: 'text-info'
                       %>
@@ -26,22 +27,22 @@
                   <%end%> 
                 </div>
               </div>
-              <p><%=visit.addition%></p>
+              <p><%=visit["visit_addition"]%></p>
               <div class="row">
                 <div class="col-md-6">
                   <span><%= link_to "Edit",
-                    edit_client_visit_path(visit.client, id: visit.id),
+                    edit_client_visit_path(visit["visit_client_id"], id: visit["visit_id"]),
                     method: :get,
-                    class: 'col-sm text-info'
-                  %></span>
+                    class: 'col-sm text-info'%>
+                  </span>
                 </div>
                 <div class="col-md-6">
                   <span><%= link_to "Delete",
-                    client_visit_path(visit.client, id: visit.id),
+                    client_visit_path(visit["visit_client_id"], id: visit["visit_id"]),
                     method: :delete,
                     data: { confirm: "Are you sure?" },
-                    class: 'col-sm text-info'
-                  %></span>
+                    class: 'col-sm text-info'%>
+                  </span> 
                 </div>
               </div>
             </div>

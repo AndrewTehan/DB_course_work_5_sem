@@ -2,12 +2,12 @@
 
 class VisitsController < ApplicationController
   def index
-    @client = current_user
+    @client = current_user.id
     @visits = current_user.visits
   end
 
   def admin_index
-    @all_visits = ActiveRecord::Base.connection.execute("select * from Visits")
+    @all_visits = connection_execute("select * from AllVisits()")
   end
 
   def change_status
@@ -23,11 +23,13 @@ class VisitsController < ApplicationController
 
   def new
     @client = current_user
-    @masters = ActiveRecord::Base.connection.execute("select * from Users where type = 'Master'")
-    @services = ActiveRecord::Base.connection.execute("select * from Services")
+    @masters = Master.all
+    #@masters = connection_execute("select * from AllMasters()")
+    @services = connection_execute("select * from AllServices()")
   end
 
   def create
+    binding.pry
     @visit = current_user.visits.build(visit_params)
     if @visit.valid?
       @visit.save
@@ -39,30 +41,30 @@ class VisitsController < ApplicationController
 
   def edit
     @client = current_user
-    @visit = Visit.find_by(id: params[:id])
-    redirect_to client_visits_path(current_user), notice: 'Redaction is possible only when state is sent' if @visit.state != 'sent'
+    @visit = Visit.find_by_sql("select * from VisitsById(#{params[:id]})").first
+    # @visit_model_instance = Visit.find_by(id: params[:id])
+    # @visit = connection_execute("select * from Visits where id = #{params[:id]}")
+    redirect_to client_visits_path(current_user), notice: 'Redaction is possible only when state is sent' if @visit["visit_state"] != 'sent'
+    @allMasters = connection_execute("select * from AllMasters()")
+    @allServices = connection_execute("select * from AllServices()")
   end
 
   def update
-    @client = Client.find_by(id: params[:client_id])
-    @visit = Visit.find_by(id: params[:id])
-    @visit.update(visit_params)
+    connection_execute("call UpdateVisit('#{visit_params["date"]}', '#{visit_params["addition"]}', #{params[:id]})")
 
-    redirect_to client_visits_path(@client)
+    redirect_to client_visits_path(current_user.id)
   end
 
   def destroy
-    @visit = Visit.find(params[:id])
-    @visit.destroy
+    connection_execute("call DeleteVisit(#{params[:id]})")
     if current_user.is_a?(Admin)
       redirect_to admin_index_path
     else
-      redirect_to client_visits_path(current_user)
+      redirect_to client_visits_path(params[:id])
     end
   end
 
   private
-
   def visit_params
     params.require(:visit).permit(:date, :addition, :master_id, service_visit_attributes: :service_id)
   end
