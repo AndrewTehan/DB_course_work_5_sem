@@ -31,7 +31,7 @@ class User < ApplicationRecord
   end
 
   def self.export_data
-    file = "/home/andrew/Documents/Saloon/public/user_data.csv"
+    file = "/home/andrew/Documents/Saloon/public/user_export_data.csv"
     
     users = connection.execute("select * from AllUsers()")
     

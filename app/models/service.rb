@@ -22,15 +22,15 @@ class Service < ApplicationRecord
   end
 
   def self.export_data
-    file = "/home/andrew/Documents/Saloon/public/service_data.csv"
+    file = "/home/andrew/Documents/Saloon/public/service_export_data.csv"
     
     services = connection.execute("select * from AllServices()")
     
-    headers = ["name_service", "service_price", "currency_price"]
+    headers = ["id", "service_name", "price_currency", "price_cents", "created_at", "updated_at"]
     
     CSV.open(file, 'wb', write_headers: true, headers: headers) do |writer|
       services.each do |service|
-        writer << [service["name_service"], service["service_price"], service["currency_price"]]
+        writer << [service["service_id"], service["name_service"], service["currency_price"], service["service_price"], service["service_created_at"], service["service_updated_at"],]
       end
     end
   end
