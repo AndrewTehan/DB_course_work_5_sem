@@ -1,0 +1,13 @@
+<div>
+  <% @search_list.each do |record| %>  
+    <% if record.class.name.equal? Service.name %>
+
+      <p> <%= link_to record.service_name, services_path%> </p>
+
+    <% elsif record.class.name.equal? Master.name %>
+
+      <p> <%= link_to record.last_name, team_path %> </p>
+
+    <% end %>
+  <% end %>
+</div> 

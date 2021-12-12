@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
+require 'elasticsearch/model'
+
 class Service < ApplicationRecord
+  include Elasticsearch::Model
+
   has_many :service_visits, dependent: :destroy
   has_many :visits, through: :service_visits
 
@@ -35,3 +39,6 @@ class Service < ApplicationRecord
     end
   end
 end
+
+Service.__elasticsearch__.create_index!
+Service.import

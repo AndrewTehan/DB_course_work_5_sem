@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  root "/#{I18n.locale}", controller: 'users', action: 'index'
+
   scope ':locale', locale: /ru|en/ do
-    root 'users#index', locale: I18n.locale
     devise_for :users
 
     resources :clients, controller: :users, only: %i[index show] do
@@ -11,6 +12,7 @@ Rails.application.routes.draw do
 
     resources :users, only: %i[destroy edit update]
 
+    post '/search', to: 'search#search'
     get '/admin_index', to: 'visits#admin_index'
     get '/clients_list', to: 'users#clients'
     get '/team', to: 'users#team'
