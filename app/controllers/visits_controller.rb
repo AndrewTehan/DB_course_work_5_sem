@@ -23,13 +23,11 @@ class VisitsController < ApplicationController
 
   def new
     @client = current_user
-    @masters = Master.all
-    #@masters = connection_execute("select * from AllMasters()")
+    @masters = connection_execute("select * from AllMasters()")
     @services = connection_execute("select * from AllServices()")
   end
 
   def create
-    binding.pry
     @visit = current_user.visits.build(visit_params)
     if @visit.valid?
       @visit.save
@@ -42,8 +40,6 @@ class VisitsController < ApplicationController
   def edit
     @client = current_user
     @visit = Visit.find_by_sql("select * from VisitsById(#{params[:id]})").first
-    # @visit_model_instance = Visit.find_by(id: params[:id])
-    # @visit = connection_execute("select * from Visits where id = #{params[:id]}")
     redirect_to client_visits_path(current_user), notice: 'Redaction is possible only when state is sent' if @visit["visit_state"] != 'sent'
     @allMasters = connection_execute("select * from AllMasters()")
     @allServices = connection_execute("select * from AllServices()")

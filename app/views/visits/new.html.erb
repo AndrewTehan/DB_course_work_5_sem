@@ -15,20 +15,17 @@
                 <input type="text" name="client_email" class="form-control" readonly="true" value=<%=@client.email%> required="true" />
               <%end%>
             </div>
+
             <div class="col-md-3 form-group">
               <%= form.text_field :date, class: "form-control", type: "datetime-local", value: "yyyy-mm-ddThh:mm:ss", required: true %>
             </div>
+
             <div class="col-md-3 form-group">
-              <select class="form-select" aria-label="Default select example" name="visit[master_id]" id="masters" required="true">
-                <% @masters.each do |m| %>
-                  <option value=<%= m.id %>>
-                    <%= m.full_name %>
-                  </option>
-                <% end %>
-              </select>
+              <%= form.select "master_id", @masters.map { |master| [master["master_first_name"], master["master_id"]] } , {},  {class: "form-select", aria_label: "Default select example", required: true }%>
             </div>
+
             <div class="col-md-3 form-group">
-              <%= form.collection_select "service_visit_attributes[service_id]", Service.all, :id, :service_name, {},  {class: "form-select", aria_label: "Default select example", required: true }%>
+              <%= form.select "service_visit_attributes[service_id]", @services.map { |service| [service["name_service"], service["service_id"]] } , {},  {class: "form-select", aria_label: "Default select example", required: true }%>
             </div>
           </div>
 
