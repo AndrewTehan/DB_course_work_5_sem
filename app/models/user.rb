@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'csv'
 
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
@@ -27,5 +28,19 @@ class User < ApplicationRecord
 
   def email_cannot_be_blank
     errors.add(:email, "shouldn't be empty") if email.blank?
+  end
+
+  def self.export_data
+    file = "/home/andrew/Documents/Saloon/public/user_data.csv"
+    
+    users = connection.execute("select * from AllUsers()")
+    
+    headers = [ "First name", "Last name", "Email", "Phone number"]
+    
+    CSV.open(file, 'wb', write_headers: true, headers: headers) do |writer|
+      users.each do |user|
+        writer << [ user["user_first_name"], user["user_last_name"], user["user_email"], user["user_phone_number"]]
+      end
+    end
   end
 end

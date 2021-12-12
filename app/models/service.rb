@@ -20,4 +20,18 @@ class Service < ApplicationRecord
   def empty_service_name
     errors.add(:service_name, "shoundn't be empty") if service_name == ''
   end
+
+  def self.export_data
+    file = "/home/andrew/Documents/Saloon/public/service_data.csv"
+    
+    services = connection.execute("select * from AllServices()")
+    
+    headers = ["name_service", "service_price", "currency_price"]
+    
+    CSV.open(file, 'wb', write_headers: true, headers: headers) do |writer|
+      services.each do |service|
+        writer << [service["name_service"], service["service_price"], service["currency_price"]]
+      end
+    end
+  end
 end
