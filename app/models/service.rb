@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
+require 'elasticsearch/model'
+
 class Service < ApplicationRecord
+  include Elasticsearch::Model
+
   has_many :service_visits, dependent: :destroy
   has_many :visits, through: :service_visits
 
@@ -20,4 +24,21 @@ class Service < ApplicationRecord
   def empty_service_name
     errors.add(:service_name, "shoundn't be empty") if service_name == ''
   end
+
+  def self.export_data
+    file = "/home/andrew/Documents/Saloon/public/service_export_data.csv"
+    
+    services = connection.execute("select * from AllServices()")
+    
+    headers = ["id", "service_name", "price_currency", "price_cents", "created_at", "updated_at"]
+    
+    CSV.open(file, 'wb', write_headers: true, headers: headers) do |writer|
+      services.each do |service|
+        writer << [service["service_id"], service["name_service"], service["currency_price"], service["service_price"], service["service_created_at"], service["service_updated_at"],]
+      end
+    end
+  end
 end
+
+Service.__elasticsearch__.create_index!
+Service.import

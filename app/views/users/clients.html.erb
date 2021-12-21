@@ -4,9 +4,9 @@
 			<%@clients.each do |client|%>
 				<div class="col-lg-4">
 					<div class="box" style="text-align: center">
-						<span><%=client["first_name"]%> <%=client["last_name"]%></span>
-							<p><%=client["email"]%></p>
-						<span><%=client["phone_number"]%></span>
+						<span><%=client["client_first_name"]%> <%=client["client_last_name"]%></span>
+							<p><%=client["client_email"]%></p>
+						<span><%=client["client_phone_number"]%></span>
 					</div>
 				</div>
 			<%end%>

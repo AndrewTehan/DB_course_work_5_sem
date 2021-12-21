@@ -1,6 +1,7 @@
 # frozen_string_literal: true
-
+require 'elasticsearch/model'
 class Master < User
+  include Elasticsearch::Model
   has_many :visits
   has_many :users, through: :visits
 
@@ -15,3 +16,6 @@ class Master < User
     errors.add(:services, "can't be blank") unless master_services.any?
   end
 end
+
+Master.__elasticsearch__.create_index!
+Master.import

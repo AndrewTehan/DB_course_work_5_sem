@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Resi Bootstrap Template - Index</title>
+    <title id="title">Resi Bootstrap Template - Index</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -36,7 +36,6 @@
     ======================================================== -->
       <%= csrf_meta_tags %>
       <%= csp_meta_tag %>
-
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
@@ -46,36 +45,48 @@
       <div class="container d-flex align-items-center justify-content-between">
         <h1><%= link_to t("header.SALON"), root_path, method: :get, class: 'nav-link scrollto '%></h1>
         <nav id="navbar" class="navbar">
-          <ul>
-              <% if current_user%>
-                <li class="dropdown"><a href="#"><span><%= t "header.visits_drop"%></span> <i class="bi bi-chevron-down"></i></a>
-                  <ul>
-                    <%unless current_user.is_a?(Admin)%>
-                      <li><%= link_to t("header.add_visit"), new_client_visit_path(current_user), method: :get, class: 'nav-link scrollto ' %></li>
-                    <%end%>
-                    <%if current_user.is_a?(Admin)%>
-                      <li><%= link_to t("header.all_visits"), admin_index_path(), method: :get, class: 'nav-link scrollto ' %></li>
-                      <li><%= link_to t("header.clients_list"), clients_list_path(), method: :get, class: 'nav-link scrollto ' %></li>
-                    <%else%>
-                      <li><%= link_to t("header.my_visits"), client_visits_path(current_user), method: :get, class: 'nav-link scrollto ' %></li>
-                    <%end%>
-                  </ul>
-                </li>
-              <%end%>
-              <li><%= link_to t("header.services"), services_path, method: :get, class: 'nav-link scrollto '%></li>
-              <li><%= link_to t("header.portfolio"), portfolio_path, method: :get, class: 'nav-link scrollto '%></li>
-              <li><%= link_to t("header.team"), team_path, method: :get, class: 'nav-link scrollto '%></li>
-              <% if current_user%>
-                <li class="dropdown"><a href="#"><span><%= t "header.account_drop"%></span> <i class="bi bi-chevron-down"></i></a>
-                  <ul>
-                    <li><%= link_to t("header.sign_out"), destroy_user_session_path, method: :delete, class: 'nav-link scrollto' %></li>
-                    <li><%= link_to t("header.edit"), edit_user_path(current_user), method: :get, class: 'nav-link scrollto' %></li>
-                    <li><%= link_to t("header.delete"), user_path(current_user), method: :delete, data: { confirm: "Are you sure?" }, class: 'nav-link scrollto' %></li>
-                    <a href=<%= url_for(locale: I18n.locale == :en ? :ru : :en)%>><%= t("header.lang") %></a>
-                  </ul>
-                </li>
-              <%end%>
-            </ul>
+          <ul>             
+            <% if current_user%>
+              <li>
+                <%= form_with url: search_path, local: false, model: @text do |form| %>
+
+                  <div class="form-floating">         
+                    <%= form.text_field :text, class: 'form-control', id: 'text', required: true %>
+                    <%= form.label 'Search', for: 'text' %>
+                    <%= form.submit 'Searh', id: 'search_button', hidden: true %>
+                  </div>
+                <% end %>  
+
+                <div id='results' style='position: relative; z-index: 2;'></div>   
+              </li>
+              <li class="dropdown"><a href="#"><span><%= t "header.visits_drop"%></span> <i class="bi bi-chevron-down"></i></a>
+                <ul>
+                  <%unless current_user.is_a?(Admin)%>
+                    <li><%= link_to t("header.add_visit"), new_client_visit_path(current_user), method: :get, class: 'nav-link scrollto ' %></li>
+                  <%end%>
+                  <%if current_user.is_a?(Admin)%>
+                    <li><%= link_to t("header.all_visits"), admin_index_path(), method: :get, class: 'nav-link scrollto ' %></li>
+                    <li><%= link_to t("header.clients_list"), clients_list_path(), method: :get, class: 'nav-link scrollto ' %></li>
+                  <%else%>
+                    <li><%= link_to t("header.my_visits"), client_visits_path(current_user), method: :get, class: 'nav-link scrollto ' %></li>
+                  <%end%>
+                </ul>
+              </li>
+            <%end%>
+            <li><%= link_to t("header.services"), services_path, method: :get, class: 'nav-link scrollto '%></li>
+            <li><%= link_to t("header.portfolio"), portfolio_path, method: :get, class: 'nav-link scrollto '%></li>
+            <li><%= link_to t("header.team"), team_path, method: :get, class: 'nav-link scrollto '%></li>
+            <% if current_user%>
+              <li class="dropdown"><a href="#"><span><%= t "header.account_drop"%></span> <i class="bi bi-chevron-down"></i></a>
+                <ul>
+                  <li><%= link_to t("header.sign_out"), destroy_user_session_path, method: :delete, class: 'nav-link scrollto' %></li>
+                  <li><%= link_to t("header.edit"), edit_user_path(current_user), method: :get, class: 'nav-link scrollto' %></li>
+                  <li><%= link_to t("header.delete"), user_path(current_user), method: :delete, data: { confirm: "Are you sure?" }, class: 'nav-link scrollto' %></li>
+                  <a href=<%= url_for(locale: I18n.locale == :en ? :ru : :en)%>><%= t("header.lang") %></a>
+                </ul>
+              </li>
+            <%end%>
+          </ul>
           <i class="bi bi-list mobile-nav-toggle"></i>
         </nav>
       </div>
@@ -88,7 +99,6 @@
             <%= msg %>
           </div>
         <% end %> 
-
         <%if type == "errors" %>
           <% msg.each do |error|%>
             <div class='alert alert-warning' role='alert'>
@@ -103,3 +113,10 @@
     <%= yield%>
   </body>
 </html>
+
+<script>
+  $('#text').on('input', () =>
+  {
+    $('#search_button').click()
+  })
+</script>

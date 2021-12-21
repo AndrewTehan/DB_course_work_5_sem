@@ -2,17 +2,15 @@
 
 class UsersController < ApplicationController
   def index
-    @user = current_user
-    @users = ActiveRecord::Base.connection.execute("select * from Users")
+    @users = connection_execute("select * from AllUsers()")
   end
 
   def destroy
-    @user = find_user
-    return redirect_to :users unless @user
+    return redirect_to :users unless current_user
 
-    if current_user.is_a?(Admin) || current_user == @user
-      reset_session if current_user == @user
-      @user.destroy
+    if current_user.is_a?(Admin) || current_user
+      reset_session if current_user
+      connection_execute("call DeleteUser(#{current_user.id})")
       redirect_to :user
     end
   end
@@ -23,24 +21,21 @@ class UsersController < ApplicationController
   end
 
   def update
-    @user = find_user
-    if @user.update user_params
-      redirect_to :root
-    else
-      render :edit
-    end
+    connection_execute("call UpdateUser('#{user_params["first_name"]}', '#{user_params["last_name"]}',
+                       '#{user_params["email"]}', '#{user_params["phone_number"]}', #{current_user.id})")
+    redirect_to :root
   end
 
   def team
-    @masters = ActiveRecord::Base.connection.execute("select * from Users where type = 'Master'")
+    @masters = connection_execute("select * from AllMasters()")
   end
 
   def services
-    @services = ActiveRecord::Base.connection.execute("select * from Services")
+    @services = connection_execute("select * from AllServices()")
   end
 
   def clients
-    @clients = ActiveRecord::Base.connection.execute("select * from Users")
+    @clients = connection_execute("select * from AllClients()")
   end
 
   private
@@ -48,9 +43,5 @@ class UsersController < ApplicationController
   def user_params
     @required_key = @user.is_a?(Admin) ? :admin : :client
     params.require(@required_key).permit(:first_name, :last_name, :email, :phone_number)
-  end
-
-  def find_user
-    User.find(params[:id])
   end
 end
