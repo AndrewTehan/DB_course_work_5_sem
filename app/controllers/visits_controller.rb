@@ -52,8 +52,7 @@ class VisitsController < ApplicationController
   end
 
   def destroy
-    connection_execute("call DeleteVisit(#{params[:id]})")
-    if current_user.is_a?(Admin)
+    connection_exec urrent_user.is_a?(Admin)
       redirect_to admin_index_path
     else
       redirect_to client_visits_path(params[:id])

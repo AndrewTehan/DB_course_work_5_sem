@@ -1,5 +1,6 @@
 CREATE or REPLACE FUNCTION AllMasters ()
 	returns table (
+		master_id bigint,
 		master_first_name varchar,
 		master_last_name varchar,
 		master_phone_number varchar
@@ -9,6 +10,7 @@ as $$
 begin
 	return query 
 		select 
+			id,
 			first_name,
 			last_name,
 			phone_number
@@ -17,10 +19,11 @@ begin
 		where
 			type = 'Master';
 end;$$
-select * from AllMasters();
+--select * from AllMasters();
 
 CREATE or REPLACE FUNCTION AllServices ()
 	returns table (
+		service_id bigint,
 		name_service varchar,		
 		service_price integer
 	)
@@ -29,12 +32,15 @@ as $$
 begin
 	return query 
 		select
+			id,
 			service_name,
 			price_cents
 		from
 			Services;
 end;$$
-select * from AllServices();
+--select * from AllServices();
+--delete from Services where id = 50000;
+
 
 CREATE or REPLACE FUNCTION AllClients ()
 	returns table (
@@ -57,7 +63,7 @@ begin
 		where 
 			type = 'Client';
 end;$$
-select * from AllClients();
+--select * from AllClients();
 
 CREATE or REPLACE FUNCTION AllUsers ()
 	returns table (
@@ -78,7 +84,7 @@ begin
 		from
 			Users;
 end;$$
-select * from AllUsers();
+--select * from AllUsers();
 
 CREATE or REPLACE FUNCTION AllVisits ()
 	returns table (
@@ -103,7 +109,7 @@ begin
 		from
 			Visits;
 end;$$
-select * from AllVisits();
+--select * from AllVisits();
 
 
 CREATE or REPLACE FUNCTION VisitsById ( integer )
@@ -131,7 +137,7 @@ begin
 		where
 			id=$1;
 end;$$
-select * from VisitsById(20);
+--select * from VisitsById(20);
 
 CREATE or REPLACE FUNCTION VisitMasterFullName (integer)
 	returns table (
@@ -152,18 +158,22 @@ begin
 		and
 			id=$1;
 end;$$
-select * from VisitMasterFullName(3);
+--select * from VisitMasterFullName(3);
 
 CREATE or REPLACE PROCEDURE DeleteUser(integer)
 LANGUAGE SQL
 AS $$
-	DELETE FROM 
+	delete from
+		Visits
+	where
+		client_id = $1;
+	delete from 
 		Users 
-	WHERE 
+	where 
 		id = $1;
 $$;
-select * from Users;
-call DeleteUser(3);
+--select * from Users;
+--call DeleteUser(3);
 
 CREATE or REPLACE PROCEDURE UpdateUser("a" character varying, "b" character varying, "c" character varying, "d" character varying, e integer)
 LANGUAGE SQL
@@ -178,8 +188,8 @@ AS $$
 	WHERE 
 		id = $5;
 $$;
-select * from Users;
-call UpdateUser('Andrew', 'Tehanov', 'andrewtehanov@gmail.com', '+375447756860', 2);
+--select * from Users;
+--call UpdateUser('Andrew', 'Tehanov', 'andrewtehanov@gmail.com', '+375447756860', 2);
 
 CREATE or REPLACE PROCEDURE UpdateVisit("a" timestamp without time zone, "b" character varying, c integer)
 LANGUAGE SQL
@@ -192,8 +202,8 @@ AS $$
 	WHERE 
 		id = $3;
 $$;
-select * from Visits;
-call UpdateVisit('2021-12-31T19:29', 'something!', 20);
+--select * from Visits;
+--call UpdateVisit('2021-12-31T19:29', 'something!', 20);
 
 CREATE or REPLACE PROCEDURE DeleteVisit ( integer )
 LANGUAGE SQL
@@ -207,9 +217,9 @@ AS $$
 	WHERE 
 		id = $1;
 $$;
-select * from Visits;
-select * from service_visits;
-call DeleteVisit(20);
+--select * from Visits;
+--select * from service_visits;
+--call DeleteVisit(20);
 
 
 
